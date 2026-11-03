@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5c3d8f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="強化 指導者">
+<title>強化指定事業 指導者ポータル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --theme: #5c3d8f; --theme-dark: #462d6e; --theme-soft: #efe9f7;
+    --bg: #f4f2f7; --card: #ffffff; --text: #222222; --muted: #6b6b76; --line: #e2dfe8;
+    --warn: #c2410c; --warn-soft: #fff1e8; --ok: #15803d; --ok-soft: #e8f6ed;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 15px; line-height: 1.6; -webkit-text-size-adjust: 100%; }
+  header { background: var(--theme); color: #fff; padding: 14px 16px 0; position: sticky; top: 0; z-index: 10; }
+  .head-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: 960px; margin: 0 auto; }
+  .app-title { font-size: 17px; font-weight: 700; margin: 0; }
+  .who { font-size: 13px; opacity: .9; margin: 2px auto 10px; max-width: 960px; }
+  .head-btns { display: flex; gap: 6px; }
+  .icon-btn { background: rgba(255,255,255,.16); color: #fff; border: 0; border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+  nav.tabs { display: flex; gap: 4px; max-width: 960px; margin: 0 auto; }
+  nav.tabs button { flex: 1; background: transparent; border: 0; color: rgba(255,255,255,.75); font: inherit; font-size: 15px; font-weight: 500; padding: 10px 4px 12px; border-bottom: 3px solid transparent; cursor: pointer; }
+  nav.tabs button.active { color: #fff; border-bottom-color: #fff; }
+  main { max-width: 960px; margin: 0 auto; padding: 16px 16px 64px; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
+  @media (min-width: 900px) { .grid { grid-template-columns: 420px 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .card h2 { font-size: 16px; margin: 0 0 12px; }
+  .center { text-align: center; color: var(--muted); }
+  .field { margin-bottom: 12px; }
+  .field > label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  input[type=text], input[type=url], input[type=date], input[type=email], select, textarea { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  textarea { min-height: 140px; resize: vertical; }
+  .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-top: 8px; cursor: pointer; }
+  .check input { width: 18px; height: 18px; }
+  .indiv { max-height: 220px; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; margin-top: 6px; }
+  .indiv .check { margin: 4px 0; }
+  .count { margin-top: 8px; font-size: 14px; font-weight: 700; color: var(--theme); }
+  .count.zero { color: var(--warn); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: inherit; font-weight: 700; border-radius: 10px; padding: 11px 18px; border: 0; cursor: pointer; text-decoration: none; }
+  .btn-primary { background: var(--theme); color: #fff; }
+  .btn-primary:disabled { background: #a99bc2; cursor: default; }
+  .btn-outline { background: #fff; color: var(--theme); border: 1px solid var(--theme); padding: 6px 12px; font-size: 13px; }
+  .btn-danger { background: #fff; color: var(--warn); border: 1px solid var(--warn); padding: 6px 12px; font-size: 13px; }
+  .btn-block { width: 100%; }
+  .err { color: var(--warn); font-size: 14px; margin-top: 8px; white-space: pre-wrap; }
+  .item { border-top: 1px solid var(--line); padding: 12px 0; }
+  .item:first-of-type { border-top: 0; padding-top: 0; }
+  .item-title { font-weight: 700; }
+  .meta { font-size: 13px; color: var(--muted); }
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .stat { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 6px; padding: 1px 8px; margin: 6px 6px 0 0; background: var(--theme-soft); color: var(--theme); }
+  .stat.warn { background: var(--warn-soft); color: var(--warn); }
+  .stat.ok { background: var(--ok-soft); color: var(--ok); }
+  .stat.gray { background: #eee; color: #777; }
+  .cancelled { opacity: .55; }
+  .code { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: 1px; }
+  .sub-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .sub-tabs button { font: inherit; font-size: 14px; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--theme); background: #fff; color: var(--theme); cursor: pointer; }
+  .sub-tabs button.active { background: var(--theme); color: #fff; }
+  table.list { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.list th, table.list td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.list th { font-size: 12px; color: var(--muted); }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 40; display: flex; align-items: flex-end; justify-content: center; }
+  @media (min-width: 640px) { .modal-bg { align-items: center; } }
+  .modal { background: #fff; width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto; border-radius: 16px 16px 0 0; padding: 18px 16px 20px; }
+  @media (min-width: 640px) { .modal { border-radius: 16px; } }
+  .modal h3 { margin: 0 0 12px; font-size: 16px; }
+  .modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+  .modal-btns .btn { padding: 10px 16px; }
+  .preview { white-space: pre-wrap; word-break: break-word; background: var(--bg); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+  .kv { font-size: 14px; margin-bottom: 6px; }
+  .kv b { display: inline-block; min-width: 72px; color: var(--muted); font-weight: 500; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #222; color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 14px; z-index: 60; max-width: calc(100% - 32px); display: none; }
+  .toast.show { display: block; }
+  .toast.error { background: var(--warn); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-row">
+    <h1 class="app-title">強化指定事業 指導者ポータル</h1>
+    <div class="head-btns" id="headBtns" hidden>
+      <button class="icon-btn" onclick="reloadAll()">更新</button>
+      <button class="icon-btn" onclick="logout()">ログアウト</button>
+    </div>
+  </div>
+  <div class="who" id="who">&nbsp;</div>
+  <nav class="tabs" id="tabs" hidden>
+    <button class="active" data-tab="msgs" onclick="showTab('msgs')">連絡</button>
+    <button data-tab="docs" onclick="showTab('docs')">資料</button>
+    <button data-tab="admin" id="adminTabBtn" onclick="showTab('admin')" hidden>管理</button>
+  </nav>
+</header>
+
+<main>
+  <section id="loginView" hidden>
+    <div class="card" style="max-width:480px;margin:0 auto;">
+      <h2>指導者用アクセスコード</h2>
+      <input type="text" id="codeInput" autocomplete="off" autocapitalize="characters" placeholder="例：AB12CD34">
+      <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="submitCode()">開く</button>
+      <div class="err" id="loginErr"></div>
+    </div>
+  </section>
+
+  <section id="loadingView" class="card center" hidden>読み込み中…</section>
+
+  <section id="errorView" class="card" hidden>
+    <div class="err" id="errorText"></div>
+    <button class="btn btn-outline" style="margin-top:12px" onclick="reloadAll()">もう一度読み込む</button>
+  </section>
+
+  <!-- 連絡 -->
+  <section id="tab-msgs" hidden>
+    <div class="grid">
+      <div class="card">
+        <h2>新しい連絡</h2>
+        <div class="field"><label for="mTitle">件名</label><input type="text" id="mTitle" maxlength="60"></div>
+        <div class="field"><label for="mBody">本文</label><textarea id="mBody"></textarea></div>
+        <div id="mPicker"></div>
+        <div class="field"><label for="mEvent">大会（任意）</label><select id="mEvent"></select></div>
+        <label class="check"><input type="checkbox" id="mNeedAck">確認ボタンを付ける（確認必須）</label>
+        <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="confirmSend()">送信内容を確認</button>
+      </div>
+      <div class="card">
+        <h2>送った連絡</h2>
+        <div id="msgList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 資料 -->
+  <section id="tab-docs" hidden>
+    <div class="grid">
+      <div class="card">
+        <h2>資料を追加</h2>
+        <div class="field"><label for="dTitle">題名</label><input type="text" id="dTitle" maxlength="60" placeholder="例：12月遠征 参加計画"></div>
+        <div class="field"><label for="dEvent">大会（任意）</label><select id="dEvent"></select></div>
+        <div id="dPicker"></div>
+        <div class="field">
+          <label>種類</label>
+          <div class="row2">
+            <label class="check" style="margin:0"><input type="radio" name="dKind" value="file" checked onchange="kindChanged()">ファイル</label>
+            <label class="check" style="margin:0"><input type="radio" name="dKind" value="link" onchange="kindChanged()">リンク</label>
+          </div>
+        </div>
+        <div class="field" id="dFileBox"><label for="dFile">ファイル（5MBまで）</label><input type="file" id="dFile" accept=".pdf,image/*,.doc,.docx,.xls,.xlsx,.ppt,.pptx"></div>
+        <div class="field" id="dUrlBox" hidden><label for="dUrl">URL</label><input type="url" id="dUrl" placeholder="https://"></div>
+        <button class="btn btn-primary btn-block" onclick="confirmDoc()">内容を確認</button>
+      </div>
+      <div class="card">
+        <h2>掲載中の資料</h2>
+        <div id="docList"></div>
+      </div>
+    </div>
+    <input type="file" id="replaceInput" hidden accept=".pdf,image/*,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+  </section>
+
+  <!-- 管理者メニュー -->
+  <section id="tab-admin" hidden>
+    <div class="sub-tabs">
+      <button data-sub="members" class="active" onclick="showSub('members')">名簿</button>
+      <button data-sub="events" onclick="showSub('events')">大会</button>
+      <button data-sub="staff" onclick="showSub('staff')">スタッフ</button>
+    </div>
+    <div id="adminBody" class="card center">読み込み中…</div>
+  </section>
+</main>
+
+<div id="modalRoot"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 設定 =====
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbzB0YAhjWzN4crbSzWo0RysQ02KX6vfNBJkGjPv43wDqC3bBpm6MH7doPxDZe_QI-4/exec';
+var CODE_KEY = 'senbatsu_staff_code';
+var MAX_BYTES = 5 * 1024 * 1024;
+
+// ===== 状態 =====
+var CODE = '';
+var S = null;        // staffInit の結果
+var ADMIN = null;    // adminInit の結果
+var CURRENT_TAB = 'msgs';
+var CURRENT_SUB = 'members';
+var MODAL_ACTIONS = [];
+var REPLACE_ID = '';
+
+// ===== 共通 =====
+function store(key, val) {
+  try {
+    if (val === undefined) return localStorage.getItem(key);
+    if (val === null) localStorage.removeItem(key); else localStorage.setItem(key, val);
+  } catch (e) { return null; }
+  return null;
+}
+
+function api(action, data) {
+  return fetch(GAS_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: action, code: CODE, data: data || {} })
+  }).then(function (res) {
+    if (!res.ok) throw new Error('通信エラー（' + res.status + '）');
+    return res.json();
+  }).then(function (j) {
+    if (!j.ok) throw new Error(j.error || '不明なエラーです。');
+    return j;
+  });
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function $(id) { return document.getElementById(id); }
+function show(id, on) { $(id).hidden = !on; }
+
+var toastTimer = null;
+function toast(msg, isErr) {
+  var t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.className = 'toast'; }, isErr ? 6000 : 3000);
+}
+
+function copyText(text, label) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function () { toast((label || '') + 'コピーしました'); },
+      function () { window.prompt('コピーしてください', text); });
+  } else {
+    window.prompt('コピーしてください', text);
+  }
+}
+
+function baseDir() {
+  return location.origin + location.pathname.replace(/[^\/]*$/, '');
+}
+function parentUrl(code) { return baseDir() + 'index.html?c=' + encodeURIComponent(code); }
+function staffUrl(code) { return baseDir() + 'staff.html?c=' + encodeURIComponent(code); }
+
+// ===== モーダル =====
+function openModal(title, html, buttons) {
+  MODAL_ACTIONS = buttons || [];
+  var b = '';
+  for (var i = 0; i < MODAL_ACTIONS.length; i++) {
+    b += '<button class="btn ' + (MODAL_ACTIONS[i].cls || 'btn-outline') + '" id="modalBtn' + i + '" onclick="modalAct(' + i + ')">' + esc(MODAL_ACTIONS[i].label) + '</button>';
+  }
+  $('modalRoot').innerHTML = '<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><h3>' + esc(title) + '</h3>' +
+    html + '<div class="err" id="modalErr"></div><div class="modal-btns">' + b + '</div></div></div>';
+}
+function closeModal() { $('modalRoot').innerHTML = ''; MODAL_ACTIONS = []; }
+function modalAct(i) {
+  var a = MODAL_ACTIONS[i];
+  if (!a) return;
+  if (!a.fn) { closeModal(); return; }
+  a.fn($('modalBtn' + i));
+}
+// 送信中表示つきで実行し、失敗したらモーダル内にエラーを出す
+function runBusy(btn, label, promise, onOk) {
+  var old = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = label || '送信中…'; }
+  promise.then(function (j) {
+    closeModal();
+    if (onOk) onOk(j);
+  }).catch(function (err) {
+    if (btn) { btn.disabled = false; btn.textContent = old; }
+    var e = $('modalErr');
+    if (e) e.textContent = 'エラー：' + err.message; else toast('エラー：' + err.message, true);
+  });
+}
+
+// ===== 起動・ログイン =====
+function init() {
+  var m = /[?&]c=([^&]+)/.exec(location.search);
+  if (m) {
+    store(CODE_KEY, decodeURIComponent(m[1]).toUpperCase());
+    if (history.replaceState) history.replaceState(null, '', location.pathname);
+  }
+  CODE = store(CODE_KEY) || '';
+  if (!CODE) { showLogin(''); return; }
+  reloadAll();
+}
+
+function showLogin(msg) {
+  show('loginView', true); show('loadingView', false); show('errorView', false);
+  show('tabs', false); show('headBtns', false); hideTabs();
+  $('loginErr').textContent = msg || '';
+  $('who').innerHTML = '&nbsp;';
+}
+
+function submitCode() {
+  var v = $('codeInput').value.replace(/\s/g, '').toUpperCase();
+  if (!v) { $('loginErr').textContent = 'コードを入力してください。'; return; }
+  CODE = v; store(CODE_KEY, v);
+  reloadAll();
+}
+
+function logout() {
+  if (!window.confirm('この端末からログアウトしますか？')) return;
+  store(CODE_KEY, null); CODE = ''; S = null; ADMIN = null;
+  showLogin('');
+}
+
+function hideTabs() { show('tab-msgs', false); show('tab-docs', false); show('tab-admin', false); }
+
+function reloadAll() {
+  show('loginView', false); show('errorView', false);
+  if (!S) show('loadingView', true);
+  return api('staffInit').then(function (j) {
+    S = j;
+    show('loadingView', false); show('tabs', true); show('headBtns', true);
+    $('who').textContent = j.me.name + (j.me.admin ? '（管理者）' : '');
+    show('adminTabBtn', j.me.admin);
+    renderStaticParts();
+    renderMsgList();
+    renderDocList();
+    if (CURRENT_TAB === 'admin' && !j.me.admin) CURRENT_TAB = 'msgs';
+    showTab(CURRENT_TAB);
+  }).catch(function (err) {
+    show('loadingView', false);
+    if (err.message.indexOf('アクセスコード') >= 0 || err.message.indexOf('保護者ポータル') >= 0) {
+      store(CODE_KEY, null); CODE = ''; S = null;
+      showLogin(err.message.indexOf('保護者ポータル') >= 0 ? 'これは保護者用のコードです。指導者用のコードを入力してください。' : err.message);
+      return;
+    }
+    hideTabs();
+    $('errorText').textContent = '読み込めませんでした：' + err.message;
+    show('errorView', true);
+  });
+}
+
+function showTab(name) {
+  CURRENT_TAB = name;
+  var btns = document.querySelectorAll('nav.tabs button');
+  for (var i = 0; i < btns.length; i++) btns[i].className = btns[i].getAttribute('data-tab') === name ? 'active' : '';
+  hideTabs();
+  show('tab-' + name, true);
+  if (name === 'admin') loadAdmin();
+}
+
+// ===== 配信先ピッカー =====
+function pickerHtml(p) {
+  var tagOpts = '<option value="">追加タグなし</option>';
+  for (var i = 0; i < S.tags.length; i++) tagOpts += '<option value="' + esc(S.tags[i]) + '">タグ：' + esc(S.tags[i]) + '</option>';
+  var list = '';
+  for (var j = 0; j < S.families.length; j++) {
+    var f = S.families[j];
+    list += '<label class="check"><input type="checkbox" class="' + p + '-fam" value="' + esc(f.id) + '" onchange="updateCount(\'' + p + '\')">' +
+      esc(f.player) + '<span class="meta">（' + esc(f.gender) + (f.team ? '・' + esc(f.team) : '') + '）</span></label>';
+  }
+  return '<div class="field"><label>配信先</label>' +
+    '<div class="row3">' +
+    '<select id="' + p + 'Gender" onchange="updateCount(\'' + p + '\')"><option value="">男女とも</option><option value="男子">男子</option><option value="女子">女子</option></select>' +
+    '<select id="' + p + 'Team" onchange="updateCount(\'' + p + '\')"><option value="">A・Bとも</option><option value="A">Aのみ</option><option value="B">Bのみ</option></select>' +
+    '<select id="' + p + 'Tag" onchange="updateCount(\'' + p + '\')">' + tagOpts + '</select>' +
+    '</div>' +
+    '<label class="check"><input type="checkbox" id="' + p + 'Indiv" onchange="indivChanged(\'' + p + '\')">家庭を個別に選ぶ</label>' +
+    '<div class="indiv" id="' + p + 'IndivList" hidden>' + (list || '<span class="meta">名簿が空です</span>') + '</div>' +
+    '<div class="count" id="' + p + 'Count"></div></div>';
+}
+
+function indivChanged(p) {
+  var on = $(p + 'Indiv').checked;
+  show(p + 'IndivList', on);
+  $(p + 'Gender').disabled = on; $(p + 'Team').disabled = on; $(p + 'Tag').disabled = on;
+  updateCount(p);
+}
+
+// null = 個別指定で1家庭も選んでいない
+function getTarget(p) {
+  if ($(p + 'Indiv').checked) {
+    var boxes = document.querySelectorAll('.' + p + '-fam');
+    var ids = [];
+    for (var i = 0; i < boxes.length; i++) if (boxes[i].checked) ids.push(boxes[i].value);
+    return ids.length ? '家庭=' + ids.join('|') : null;
+  }
+  var parts = [];
+  if ($(p + 'Gender').value) parts.push('性別=' + $(p + 'Gender').value);
+  if ($(p + 'Team').value) parts.push('チーム=' + $(p + 'Team').value);
+  if ($(p + 'Tag').value) parts.push('タグ=' + $(p + 'Tag').value);
+  return parts.join(';');
+}
+
+function targetLabel(p) {
+  if ($(p + 'Indiv').checked) {
+    var boxes = document.querySelectorAll('.' + p + '-fam');
+    var names = [];
+    for (var i = 0; i < boxes.length; i++) if (boxes[i].checked) names.push(boxes[i].parentNode.firstChild.nextSibling.textContent);
+    return '個別：' + names.join('、');
+  }
+  var parts = [];
+  parts.push($(p + 'Gender').value || '男女とも');
+  parts.push($(p + 'Team').value ? $(p + 'Team').value + 'チームのみ' : 'A・Bとも');
+  if ($(p + 'Tag').value) parts.push('タグ：' + $(p + 'Tag').value);
+  return parts.join('／');
+}
+
+function matchFamily(f, target) {
+  var o = { gender: '', team: '', tag: '', families: [] };
+  var parts = String(target || '').split(';');
+  for (var i = 0; i < parts.length; i++) {
+    var kv = parts[i].split('=');
+    if (kv.length < 2) continue;
+    if (kv[0] === '性別') o.gender = kv[1];
+    else if (kv[0] === 'チーム') o.team = kv[1];
+    else if (kv[0] === 'タグ') o.tag = kv[1];
+    else if (kv[0] === '家庭') o.families = kv[1].split('|');
+  }
+  if (o.families.length) return o.families.indexOf(f.id) >= 0;
+  if (o.gender && f.gender !== o.gender) return false;
+  if (o.team && f.team !== o.team) return false;
+  if (o.tag && f.tags.indexOf(o.tag) < 0) return false;
+  return true;
+}
+
+function countTarget(target) {
+  if (target === null) return 0;
+  var n = 0;
+  for (var i = 0; i < S.families.length; i++) if (matchFamily(S.families[i], target)) n++;
+  return n;
+}
+
+function updateCount(p) {
+  var n = countTarget(getTarget(p));
+  var el = $(p + 'Count');
+  el.textContent = '対象：' + n + '家庭';
+  el.className = 'count' + (n === 0 ? ' zero' : '');
+}
+
+// ピッカーと大会選択を作り直す（入力中の値は残す）
+function renderStaticParts() {
+  var keep = {};
+  var ids = ['mGender', 'mTeam', 'mTag', 'dGender', 'dTeam', 'dTag', 'mEvent', 'dEvent'];
+  var i;
+  for (i = 0; i < ids.length; i++) if ($(ids[i])) keep[ids[i]] = $(ids[i]).value;
+  $('mPicker').innerHTML = pickerHtml('m');
+  $('dPicker').innerHTML = pickerHtml('d');
+  var opts = '<option value="">指定なし</option>';
+  var todayId = '';
+  for (i = 0; i < S.events.length; i++) {
+    var ev = S.events[i];
+    if (ev.today) todayId = ev.id;
+    opts += '<option value="' + esc(ev.id) + '">' + esc(ev.date + '　' + ev.name) + (ev.today ? '（今日の大会）' : '') + '</option>';
+  }
+  $('mEvent').innerHTML = opts; $('dEvent').innerHTML = opts;
+  for (i = 0; i < ids.length; i++) {
+    if (keep[ids[i]] !== undefined && $(ids[i])) $(ids[i]).value = keep[ids[i]];
+    if ($(ids[i]) && $(ids[i]).selectedIndex < 0) $(ids[i]).selectedIndex = 0;
+  }
+  // 大会欄は、選んでいなければ「今日の大会」を入れておく
+  if (!$('mEvent').value) $('mEvent').value = todayId;
+  if (!$('dEvent').value) $('dEvent').value = todayId;
+  updateCount('m'); updateCount('d');
+}
+
+// ===== 連絡 =====
+function confirmSend() {
+  var title = $('mTitle').value.trim();
+  var body = $('mBody').value.trim();
+  var target = getTarget('m');
+  var n = countTarget(target);
+  if (!title) { toast('件名を入力してください', true); return; }
+  if (!body) { toast('本文を入力してください', true); return; }
+  if (n === 0) { toast('対象が0家庭です。配信先を見直してください', true); return; }
+  var needAck = $('mNeedAck').checked;
+  var evSel = $('mEvent');
+  var html = '<div class="kv"><b>配信先</b>' + esc(targetLabel('m')) + '（' + n + '家庭）</div>' +
+    '<div class="kv"><b>大会</b>' + esc(evSel.value ? evSel.options[evSel.selectedIndex].text : '指定なし') + '</div>' +
+    '<div class="kv"><b>確認</b>' + (needAck ? '確認ボタンあり' : 'なし') + '</div>' +
+    '<div class="kv"><b>件名</b>' + esc(title) + '</div>' +
+    '<div class="preview">' + esc(body) + '</div>' +
+    '<p class="meta">保護者には送信者「強化指定事業スタッフ」として表示され、配信先の区分は表示されません。</p>';
+  openModal('この内容で送信しますか？', html, [
+    { label: 'やめる' },
+    { label: '送信する', cls: 'btn-primary', fn: function (btn) {
+      runBusy(btn, '送信中…', api('sendMessage', { title: title, body: body, target: target, needAck: needAck, eventId: evSel.value }), function (j) {
+        $('mTitle').value = ''; $('mBody').value = ''; $('mNeedAck').checked = false;
+        toast(j.total + '家庭に送信しました');
+        reloadAll();
+      });
+    } }
+  ]);
+}
+
+function renderMsgList() {
+  var h = '';
+  for (var i = 0; i < S.messages.length; i++) {
+    var m = S.messages[i];
+    var cancelled = m.status === '取消';
+    h += '<div class="item' + (cancelled ? ' cancelled' : '') + '">';
+    h += '<div class="item-title">' + esc(m.title) + '</div>';
+    h += '<div class="meta">' + esc(m.at) + '　' + esc(m.staffName) + '　配信先：' + esc(m.targetLabel) + (m.eventName ? '　' + esc(m.eventName) : '') + '</div>';
+    if (cancelled) {
+      h += '<span class="stat gray">取り消し済み</span>';
+    } else {
+      h += '<span class="stat">既読 ' + m.read + '/' + m.total + '</span>';
+      if (m.needAck) h += '<span class="stat ' + (m.acked < m.total ? 'warn' : 'ok') + '">確認 ' + m.acked + '/' + m.total + '</span>';
+      h += '<div class="actions"><button class="btn btn-outline" onclick="openDetail(\'' + m.id + '\')">確認状況</button>' +
+           '<button class="btn btn-danger" onclick="cancelMsg(\'' + m.id + '\')">取り消す</button></div>';
+    }
+    h += '</div>';
+  }
+  $('msgList').innerHTML = h || '<div class="center">まだ送った連絡はありません。</div>';
+}
+
+function findMsg(id) {
+  for (var i = 0; i < S.messages.length; i++) if (S.messages[i].id === id) return S.messages[i];
+  return null;
+}
+
+function openDetail(id) {
+  var m = findMsg(id);
+  openModal(m.title, '<div class="center">読み込み中…</div>', [{ label: '閉じる' }]);
+  api('msgDetail', { msgId: id }).then(function (j) {
+    var rows = j.rows.slice();
+    rows.sort(function (a, b) {
+      var ka = (j.needAck ? (a.ackAt ? 2 : 0) : 0) + (a.readAt ? 1 : 0);
+      var kb = (j.needAck ? (b.ackAt ? 2 : 0) : 0) + (b.readAt ? 1 : 0);
+      return ka - kb;
+    });
+    var h = '<div class="preview" style="margin-bottom:12px">' + esc(m.body) + '</div>';
+    h += '<table class="list"><tr><th>選手（保護者）</th><th>区分</th><th>既読</th>' + (j.needAck ? '<th>確認</th>' : '') + '</tr>';
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      h += '<tr><td>' + esc(r.player) + (r.parent ? '<div class="meta">' + esc(r.parent) + '</div>' : '') + '</td>' +
+        '<td class="meta">' + esc(r.gender) + (r.team ? '・' + esc(r.team) : '') + '</td>' +
+        '<td>' + (r.readAt ? '<span class="meta">' + esc(r.readAt.slice(5)) + '</span>' : '<span class="stat warn">未読</span>') + '</td>' +
+        (j.needAck ? '<td>' + (r.ackAt ? '<span class="stat ok">済</span>' : '<span class="stat warn">未</span>') + '</td>' : '') + '</tr>';
+    }
+    h += '</table>';
+    openModal(m.title, h, [{ label: '閉じる' }]);
+  }).catch(function (err) {
+    openModal(m.title, '<div class="err">エラー：' + esc(err.message) + '</div>', [{ label: '閉じる' }]);
+  });
+}
+
+function cancelMsg(id) {
+  var m = findMsg(id);
+  openModal('連絡を取り消しますか？', '<div class="kv"><b>件名</b>' + esc(m.title) + '</div><p class="meta">保護者ポータルから見えなくなります。記録はスプレッドシートに残ります。</p>', [
+    { label: 'やめる' },
+    { label: '取り消す', cls: 'btn-primary', fn: function (btn) {
+      runBusy(btn, '処理中…', api('cancelMessage', { msgId: id }), function () { toast('取り消しました'); reloadAll(); });
+    } }
+  ]);
+}
+
+// ===== 資料 =====
+function kindChanged() {
+  var link = document.querySelector('input[name=dKind]:checked').value === 'link';
+  show('dFileBox', !link); show('dUrlBox', link);
+}
+
+function readFileB64(file) {
+  return new Promise(function (resolve, reject) {
+    if (file.size > MAX_BYTES) { reject(new Error('ファイルが5MBを超えています（' + Math.round(file.size / 1024 / 1024 * 10) / 10 + 'MB）。')); return; }
+    var fr = new FileReader();
+    fr.onload = function () { resolve(String(fr.result).split(',')[1]); };
+    fr.onerror = function () { reject(new Error('ファイルを読み込めませんでした。')); };
+    fr.readAsDataURL(file);
+  });
+}
+
+function confirmDoc() {
+  var title = $('dTitle').value.trim();
+  var target = getTarget('d');
+  var n = countTarget(target);
+  var link = document.querySelector('input[name=dKind]:checked').value === 'link';
+  var file = $('dFile').files[0];
+  var url = $('dUrl').value.trim();
+  if (!title) { toast('題名を入力してください', true); return; }
+  if (n === 0) { toast('対象が0家庭です。配信先を見直してください', true); return; }
+  if (link && !/^https?:\/\//.test(url)) { toast('http から始まるURLを入力してください', true); return; }
+  if (!link && !file) { toast('ファイルを選んでください', true); return; }
+  if (!link && file.size > MAX_BYTES) { toast('ファイルが5MBを超えています', true); return; }
+  var evSel = $('dEvent');
+  var html = '<div class="kv"><b>題名</b>' + esc(title) + '</div>' +
+    '<div class="kv"><b>配信先</b>' + esc(targetLabel('d')) + '（' + n + '家庭）</div>' +
+    '<div class="kv"><b>大会</b>' + esc(evSel.value ? evSel.options[evSel.selectedIndex].text : '指定なし（共通の資料）') + '</div>' +
+    '<div class="kv"><b>' + (link ? 'URL' : 'ファイル') + '</b>' + esc(link ? url : file.name) + '</div>';
+  openModal('この資料を掲載しますか？', html, [
+    { label: 'やめる' },
+    { label: '掲載する', cls: 'btn-primary', fn: function (btn) {
+      var p = link
+        ? api('uploadDoc', { title: title, target: target, eventId: evSel.value, url: url })
+        : readFileB64(file).then(function (b64) {
+            return api('uploadDoc', { title: title, target: target, eventId: evSel.value, fileName: file.name, mimeType: file.type, base64: b64 });
+          });
+      runBusy(btn, '送信中…', p, function () {
+        $('dTitle').value = ''; $('dFile').value = ''; $('dUrl').value = '';
+        toast('資料を掲載しました');
+        reloadAll();
+      });
+    } }
+  ]);
+}
+
+function renderDocList() {
+  var h = '';
+  for (var i = 0; i < S.documents.length; i++) {
+    var d = S.documents[i];
+    h += '<div class="item"><div class="item-title">' + esc(d.title) + '</div>';
+    h += '<div class="meta">' + esc(d.eventName || '共通') + '　配信先：' + esc(d.targetLabel) + '　' +
+      esc(d.updatedAt ? d.updatedAt + ' 更新' : d.createdAt) + (d.staffName ? '　' + esc(d.staffName) : '') + '</div>';
+    h += '<div class="actions">';
+    if (d.viewUrl) h += '<a class="btn btn-outline" href="' + esc(d.viewUrl) + '" target="_blank" rel="noopener">開く</a>';
+    h += '<button class="btn btn-outline" onclick="startReplace(\'' + d.id + '\')">差し替え</button>';
+    h += '<button class="btn btn-danger" onclick="deleteDoc(\'' + d.id + '\')">削除</button></div></div>';
+  }
+  $('docList').innerHTML = h || '<div class="center">まだ資料はありません。</div>';
+}
+
+function findDoc(id) {
+  for (var i = 0; i < S.documents.length; i++) if (S.documents[i].id === id) return S.documents[i];
+  return null;
+}
+
+function startReplace(id) {
+  var d = findDoc(id);
+  if (d.kind === 'リンク') {
+    openModal('リンクを差し替え', '<div class="field"><label>新しいURL</label><input type="url" id="newUrl" value="' + esc(d.viewUrl) + '"></div>', [
+      { label: 'やめる' },
+      { label: '差し替える', cls: 'btn-primary', fn: function (btn) {
+        var u = $('newUrl').value.trim();
+        runBusy(btn, '送信中…', api('replaceDoc', { docId: id, url: u }), function () { toast('差し替えました'); reloadAll(); });
+      } }
+    ]);
+    return;
+  }
+  REPLACE_ID = id;
+  $('replaceInput').value = '';
+  $('replaceInput').click();
+}
+
+function onReplaceFile() {
+  var file = $('replaceInput').files[0];
+  var d = findDoc(REPLACE_ID);
+  if (!file || !d) return;
+  openModal('訂正版に差し替えますか？', '<div class="kv"><b>資料</b>' + esc(d.title) + '</div><div class="kv"><b>新ファイル</b>' + esc(file.name) + '</div>' +
+    '<p class="meta">保護者には同じ資料として「更新」の日付付きで表示されます。旧版は非公開にしてDriveに残します。</p>', [
+    { label: 'やめる' },
+    { label: '差し替える', cls: 'btn-primary', fn: function (btn) {
+      var p = readFileB64(file).then(function (b64) {
+        return api('replaceDoc', { docId: d.id, fileName: file.name, mimeType: file.type, base64: b64 });
+      });
+      runBusy(btn, '送信中…', p, function () { toast('差し替えました'); reloadAll(); });
+    } }
+  ]);
+}
+
+function deleteDoc(id) {
+  var d = findDoc(id);
+  openModal('資料を削除しますか？', '<div class="kv"><b>資料</b>' + esc(d.title) + '</div><p class="meta">保護者ポータルから見えなくなります。ファイルは非公開にしてDriveに残します。</p>', [
+    { label: 'やめる' },
+    { label: '削除する', cls: 'btn-primary', fn: function (btn) {
+      runBusy(btn, '処理中…', api('deleteDoc', { docId: id }), function () { toast('削除しました'); reloadAll(); });
+    } }
+  ]);
+}
+
+// ===== 管理者メニュー =====
+function loadAdmin() {
+  $('adminBody').className = 'card center';
+  $('adminBody').innerHTML = '読み込み中…';
+  return api('adminInit').then(function (j) {
+    ADMIN = j;
+    $('adminBody').className = 'card';
+    renderAdmin();
+  }).catch(function (err) {
+    $('adminBody').className = 'card';
+    $('adminBody').innerHTML = '<div class="err">読み込めませんでした：' + esc(err.message) + '</div>';
+  });
+}
+
+function afterAdminChange(msg) {
+  toast(msg);
+  loadAdmin();
+  reloadAll();
+}
+
+function showSub(name) {
+  CURRENT_SUB = name;
+  var btns = document.querySelectorAll('.sub-tabs button');
+  for (var i = 0; i < btns.length; i++) btns[i].className = btns[i].getAttribute('data-sub') === name ? 'active' : '';
+  if (ADMIN) renderAdmin();
+}
+
+function renderAdmin() {
+  if (CURRENT_SUB === 'members') renderMembers();
+  else if (CURRENT_SUB === 'events') renderEvents();
+  else renderStaffAdmin();
+}
+
+function findIn(list, id) {
+  for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+  return null;
+}
+
+// --- 名簿 ---
+function renderMembers() {
+  var ms = ADMIN.members;
+  var missing = 0;
+  var h = '<div class="actions" style="margin:0 0 12px">' +
+    '<button class="btn btn-primary" onclick="editMember(\'\')">家庭を追加</button>';
+  for (var k = 0; k < ms.length; k++) if (!ms[k].code || !ms[k].id) missing++;
+  if (missing) h += '<button class="btn btn-outline" onclick="issueCodes(' + missing + ')">未発行の' + missing + '家庭にコードを発行</button>';
+  h += '</div>';
+  h += '<p class="meta" style="margin-top:0">' + ms.length + '家庭。スプレッドシートの members シートに直接貼り付けた名簿にも、上のボタンで家庭IDとコードを付けられます。</p>';
+  h += '<table class="list"><tr><th>選手</th><th>区分・タグ</th><th>コード</th><th></th></tr>';
+  for (var i = 0; i < ms.length; i++) {
+    var m = ms[i];
+    h += '<tr><td><b>' + esc(m.player) + '</b><div class="meta">' + esc(m.parent || '') + '</div></td>' +
+      '<td>' + esc(m.gender) + (m.team ? '・' + esc(m.team) : '') + (m.tags ? '<div class="meta">' + esc(m.tags.split('|').join('、')) + '</div>' : '') + '</td>' +
+      '<td class="code">' + esc(m.code || '未発行') + '</td><td><div class="actions" style="margin:0">';
+    if (m.id) h += '<button class="btn btn-outline" onclick="editMember(\'' + m.id + '\')">編集</button>';
+    if (m.code) h += '<button class="btn btn-outline" onclick="copyText(parentUrl(\'' + m.code + '\'), \'保護者用URLを\')">URLコピー</button>';
+    if (m.id && m.code) h += '<button class="btn btn-danger" onclick="regen(\'member\', \'' + m.id + '\')">再発行</button>';
+    h += '</div></td></tr>';
+  }
+  h += '</table>';
+  $('adminBody').innerHTML = h;
+}
+
+function editMember(id) {
+  var m = id ? findIn(ADMIN.members, id) : { player: '', gender: '男子', team: '', tags: '', parent: '', email: '', lineId: '' };
+  var html =
+    '<div class="field"><label>選手名</label><input type="text" id="fPlayer" value="' + esc(m.player) + '"></div>' +
+    '<div class="row2"><div class="field"><label>性別</label><select id="fGender"><option value="男子">男子</option><option value="女子">女子</option></select></div>' +
+    '<div class="field"><label>チーム</label><select id="fTeam"><option value="">未定</option><option value="A">A</option><option value="B">B</option></select></div></div>' +
+    '<div class="field"><label>追加タグ（複数は「、」で区切る）</label><input type="text" id="fTags" value="' + esc((m.tags || '').split('|').join('、')) + '" placeholder="例：遠征、宿泊あり"></div>' +
+    '<div class="field"><label>保護者名</label><input type="text" id="fParent" value="' + esc(m.parent) + '"></div>' +
+    '<div class="field"><label>メール（通知用）</label><input type="email" id="fEmail" value="' + esc(m.email) + '"></div>' +
+    '<div class="field"><label>LINE ID（将来の通知用・任意）</label><input type="text" id="fLine" value="' + esc(m.lineId) + '"></div>';
+  openModal(id ? '家庭を編集' : '家庭を追加', html, [
+    { label: 'やめる' },
+    { label: '保存する', cls: 'btn-primary', fn: function (btn) {
+      var data = { id: id, player: $('fPlayer').value, gender: $('fGender').value, team: $('fTeam').value,
+        tags: $('fTags').value, parent: $('fParent').value, email: $('fEmail').value, lineId: $('fLine').value };
+      runBusy(btn, '保存中…', api('saveMember', { member: data }), function (j) {
+        afterAdminChange(j.code ? '追加しました（コード ' + j.code + '）' : '保存しました');
+      });
+    } }
+  ]);
+  $('fGender').value = m.gender || '男子';
+  $('fTeam').value = m.team || '';
+}
+
+function issueCodes(n) {
+  openModal('コードを発行しますか？', '<p>家庭IDまたはアクセスコードが空欄の ' + n + ' 家庭に発行します。</p>', [
+    { label: 'やめる' },
+    { label: '発行する', cls: 'btn-primary', fn: function (btn) {
+      runBusy(btn, '発行中…', api('issueMissingCodes'), function (j) { afterAdminChange(j.count + '家庭に発行しました'); });
+    } }
+  ]);
+}
+
+function regen(kind, id) {
+  var row = kind === 'staff' ? findIn(ADMIN.staff, id) : findIn(ADMIN.members, id);
+  var name = row ? (kind === 'staff' ? row.name : row.player) : '';
+  openModal('コードを再発行しますか？', '<p>' + esc(name) + ' のアクセスコードを作り直します。<b>今のコードと配布済みのURLはすぐに使えなくなります。</b>紛失・流出したときに使ってください。</p>', [
+    { label: 'やめる' },
+    { label: '再発行する', cls: 'btn-primary', fn: function (btn) {
+      runBusy(btn, '処理中…', api('regenCode', { kind: kind, id: id }), function (j) {
+        if (kind === 'staff' && id === findSelfId()) { CODE = j.code; store(CODE_KEY, j.code); }
+        afterAdminChange('新しいコード ' + j.code + ' を発行しました');
+      });
+    } }
+  ]);
+}
+
+function findSelfId() {
+  if (!ADMIN) return '';
+  for (var i = 0; i < ADMIN.staff.length; i++) if (ADMIN.staff[i].code.toUpperCase() === CODE) return ADMIN.staff[i].id;
+  return '';
+}
+
+// --- 大会 ---
+function renderEvents() {
+  var evs = ADMIN.events;
+  var h = '<div class="actions" style="margin:0 0 12px"><button class="btn btn-primary" onclick="editEvent(\'\')">大会を追加</button></div>';
+  h += '<p class="meta" style="margin-top:0">「今日の大会」にすると、連絡・資料（今後は写真も）の大会欄に最初から選ばれます。大会を追加するとDriveに大会フォルダが自動で作られます。</p>';
+  h += '<table class="list"><tr><th>日付</th><th>大会名</th><th>今日の大会</th><th></th></tr>';
+  for (var i = 0; i < evs.length; i++) {
+    var e = evs[i];
+    h += '<tr><td>' + esc(e.date) + '</td><td>' + esc(e.name) + '</td>' +
+      '<td><label class="check" style="margin:0"><input type="radio" name="todayEv"' + (e.today ? ' checked' : '') + ' onchange="setToday(\'' + e.id + '\')">今日</label></td>' +
+      '<td><button class="btn btn-outline" onclick="editEvent(\'' + e.id + '\')">編集</button></td></tr>';
+  }
+  h += '</table>';
+  if (evs.length) h += '<button class="btn btn-outline" style="margin-top:12px" onclick="setToday(\'\')">今日の大会を解除</button>';
+  $('adminBody').innerHTML = h;
+}
+
+function editEvent(id) {
+  var e = id ? findIn(ADMIN.events, id) : { name: '', date: '' };
+  var html = '<div class="field"><label>大会名</label><input type="text" id="eName" value="' + esc(e.name) + '"></div>' +
+    '<div class="field"><label>日付（初日）</label><input type="date" id="eDate" value="' + esc((e.date || '').replace(/\//g, '-')) + '"></div>';
+  openModal(id ? '大会を編集' : '大会を追加', html, [
+    { label: 'やめる' },
+    { label: '保存する', cls: 'btn-primary', fn: function (btn) {
+      runBusy(btn, '保存中…', api('saveEvent', { event: { id: id, name: $('eName').value, date: $('eDate').value } }), function () {
+        afterAdminChange('保存しました');
+      });
+    } }
+  ]);
+}
+
+function setToday(id) {
+  api('setToday', { eventId: id }).then(function () { afterAdminChange(id ? '今日の大会を設定しました' : '今日の大会を解除しました'); })
+    .catch(function (err) { toast('エラー：' + err.message, true); loadAdmin(); });
+}
+
+// --- スタッフ ---
+function renderStaffAdmin() {
+  var st = ADMIN.staff;
+  var h = '<div class="actions" style="margin:0 0 12px"><button class="btn btn-primary" onclick="editStaff(\'\')">スタッフを追加</button></div>';
+  h += '<p class="meta" style="margin-top:0">保護者には個人名は表示されず、すべて「強化指定事業スタッフ」として届きます。</p>';
+  h += '<table class="list"><tr><th>氏名</th><th>役割</th><th>コード</th><th></th></tr>';
+  for (var i = 0; i < st.length; i++) {
+    var s = st[i];
+    h += '<tr><td>' + esc(s.name) + '</td><td>' + esc(s.role) + '</td><td class="code">' + esc(s.code) + '</td><td><div class="actions" style="margin:0">' +
+      '<button class="btn btn-outline" onclick="editStaff(\'' + s.id + '\')">編集</button>' +
+      '<button class="btn btn-outline" onclick="copyText(staffUrl(\'' + s.code + '\'), \'指導者用URLを\')">URLコピー</button>' +
+      '<button class="btn btn-danger" onclick="regen(\'staff\', \'' + s.id + '\')">再発行</button></div></td></tr>';
+  }
+  h += '</table>';
+  $('adminBody').innerHTML = h;
+}
+
+function editStaff(id) {
+  var s = id ? findIn(ADMIN.staff, id) : { name: '', role: 'スタッフ' };
+  var html = '<div class="field"><label>氏名</label><input type="text" id="sName" value="' + esc(s.name) + '"></div>' +
+    '<div class="field"><label>役割</label><select id="sRole"><option value="スタッフ">スタッフ</option><option value="管理者">管理者</option></select></div>' +
+    '<p class="meta">管理者は名簿・大会・スタッフの設定ができます。</p>';
+  openModal(id ? 'スタッフを編集' : 'スタッフを追加', html, [
+    { label: 'やめる' },
+    { label: '保存する', cls: 'btn-primary', fn: function (btn) {
+      runBusy(btn, '保存中…', api('saveStaff', { staff: { id: id, name: $('sName').value, role: $('sRole').value } }), function (j) {
+        afterAdminChange(j.code ? '追加しました（コード ' + j.code + '）' : '保存しました');
+      });
+    } }
+  ]);
+  $('sRole').value = s.role === '管理者' ? '管理者' : 'スタッフ';
+}
+
+// ===== イベント登録 =====
+$('replaceInput').addEventListener('change', onReplaceFile);
+$('codeInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') submitCode(); });
+
+init();
+</script>
+</body>
+</html>

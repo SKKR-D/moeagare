@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5c3d8f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="強化 保護者">
+<title>強化指定事業 保護者ポータル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --theme: #5c3d8f; --theme-dark: #462d6e; --theme-soft: #efe9f7;
+    --bg: #f4f2f7; --card: #ffffff; --text: #222222; --muted: #6b6b76; --line: #e2dfe8;
+    --warn: #c2410c; --warn-soft: #fff1e8; --ok: #15803d; --ok-soft: #e8f6ed;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 16px; line-height: 1.6; -webkit-text-size-adjust: 100%; }
+  header { background: var(--theme); color: #fff; padding: 14px 16px 0; position: sticky; top: 0; z-index: 10; }
+  .head-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .app-title { font-size: 17px; font-weight: 700; margin: 0; }
+  .who { font-size: 13px; opacity: .9; margin: 2px 0 10px; }
+  .icon-btn { background: rgba(255,255,255,.16); color: #fff; border: 0; border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+  nav.tabs { display: flex; gap: 4px; }
+  nav.tabs button { flex: 1; background: transparent; border: 0; color: rgba(255,255,255,.75); font: inherit; font-size: 15px; font-weight: 500; padding: 10px 4px 12px; border-bottom: 3px solid transparent; cursor: pointer; position: relative; }
+  nav.tabs button.active { color: #fff; border-bottom-color: #fff; }
+  .badge { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 4px; border-radius: 10px; background: #ff6b4a; color: #fff; font-size: 12px; line-height: 20px; text-align: center; }
+  main { max-width: 640px; margin: 0 auto; padding: 16px 16px 48px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .center { text-align: center; color: var(--muted); }
+  h2 { font-size: 16px; margin: 0 0 8px; }
+  input[type=text], select { width: 100%; font: inherit; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: inherit; font-weight: 700; border-radius: 10px; padding: 12px 18px; border: 0; cursor: pointer; text-decoration: none; }
+  .btn-primary { background: var(--theme); color: #fff; }
+  .btn-primary:disabled { background: #a99bc2; }
+  .btn-outline { background: #fff; color: var(--theme); border: 1px solid var(--theme); padding: 9px 14px; font-size: 14px; }
+  .btn-block { width: 100%; margin-top: 12px; }
+  .err { color: var(--warn); font-size: 14px; margin-top: 8px; white-space: pre-wrap; }
+  .msg { padding: 0; overflow: hidden; }
+  .msg-head { padding: 14px 16px; cursor: pointer; }
+  .msg-title { font-weight: 500; display: flex; align-items: flex-start; gap: 8px; }
+  .msg.unread .msg-title { font-weight: 700; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #ff6b4a; flex: none; margin-top: 8px; }
+  .msg-meta { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 6px; padding: 1px 8px; margin-top: 6px; }
+  .tag-warn { background: var(--warn-soft); color: var(--warn); }
+  .tag-ok { background: var(--ok-soft); color: var(--ok); }
+  .tag-new { background: var(--theme-soft); color: var(--theme); }
+  .msg-body { border-top: 1px solid var(--line); padding: 14px 16px 16px; white-space: pre-wrap; word-break: break-word; }
+  .msg-body a { color: var(--theme); }
+  .ack-box { margin-top: 14px; padding: 12px; border-radius: 10px; background: var(--warn-soft); }
+  .ack-box.done { background: var(--ok-soft); color: var(--ok); font-weight: 700; }
+  .doc { display: flex; flex-direction: column; gap: 10px; }
+  .doc-title { font-weight: 700; }
+  .doc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #222; color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 14px; z-index: 50; max-width: calc(100% - 32px); display: none; }
+  .toast.show { display: block; }
+  .toast.error { background: var(--warn); }
+  .filter { margin-bottom: 12px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-row">
+    <h1 class="app-title">強化指定事業 保護者ポータル</h1>
+    <button class="icon-btn" id="reloadBtn" onclick="loadFeed()" hidden>更新</button>
+  </div>
+  <div class="who" id="who">&nbsp;</div>
+  <nav class="tabs" id="tabs" hidden>
+    <button class="active" data-tab="msgs" onclick="showTab('msgs')">お知らせ<span class="badge" id="msgBadge" hidden></span></button>
+    <button data-tab="docs" onclick="showTab('docs')">資料<span class="badge" id="docBadge" hidden></span></button>
+    <button data-tab="photos" onclick="showTab('photos')">写真</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ログイン -->
+  <section id="loginView" hidden>
+    <div class="card">
+      <h2>アクセスコードを入力してください</h2>
+      <p class="center" style="text-align:left;margin:0 0 12px;font-size:14px;">配布されたURLから開くと、入力は不要です。</p>
+      <input type="text" id="codeInput" autocomplete="off" autocapitalize="characters" placeholder="例：AB12CD34">
+      <button class="btn btn-primary btn-block" onclick="submitCode()">開く</button>
+      <div class="err" id="loginErr"></div>
+    </div>
+  </section>
+
+  <section id="loadingView" class="card center" hidden>読み込み中…</section>
+
+  <section id="errorView" class="card" hidden>
+    <div class="err" id="errorText"></div>
+    <button class="btn btn-outline" style="margin-top:12px" onclick="loadFeed()">もう一度読み込む</button>
+  </section>
+
+  <section id="tab-msgs" hidden></section>
+
+  <section id="tab-docs" hidden>
+    <div class="filter"><select id="docFilter" onchange="renderDocs()"></select></div>
+    <div id="docList"></div>
+  </section>
+
+  <section id="tab-photos" hidden>
+    <div class="card center">写真は準備中です。<br>大会の写真は、ここで見られるようになります。</div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 設定 =====
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbzB0YAhjWzN4crbSzWo0RysQ02KX6vfNBJkGjPv43wDqC3bBpm6MH7doPxDZe_QI-4/exec';
+var CODE_KEY = 'senbatsu_parent_code';
+var NEW_DAYS = 7;
+
+// ===== 状態 =====
+var CODE = '';
+var FEED = null;
+var OPEN = {};
+var CURRENT_TAB = 'msgs';
+
+// ===== 共通 =====
+function store(key, val) {
+  try {
+    if (val === undefined) return localStorage.getItem(key);
+    if (val === null) localStorage.removeItem(key); else localStorage.setItem(key, val);
+  } catch (e) { return null; }
+  return null;
+}
+
+function api(action, data) {
+  return fetch(GAS_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: action, code: CODE, data: data || {} })
+  }).then(function (res) {
+    if (!res.ok) throw new Error('通信エラー（' + res.status + '）');
+    return res.json();
+  }).then(function (j) {
+    if (!j.ok) throw new Error(j.error || '不明なエラーです。');
+    return j;
+  });
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function linkify(s) {
+  return esc(s).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+}
+
+function parseDate(s) {
+  var m = /^(\d{4})\/(\d{2})\/(\d{2})(?: (\d{2}):(\d{2}))?/.exec(s || '');
+  if (!m) return null;
+  return new Date(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0));
+}
+
+function isNew(s) {
+  var d = parseDate(s);
+  return d ? (new Date().getTime() - d.getTime()) < NEW_DAYS * 86400000 : false;
+}
+
+var toastTimer = null;
+function toast(msg, isErr) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.className = 'toast'; }, 3000);
+}
+
+function show(id, on) { document.getElementById(id).hidden = !on; }
+
+// ===== 起動 =====
+function init() {
+  var m = /[?&]c=([^&]+)/.exec(location.search);
+  if (m) {
+    store(CODE_KEY, decodeURIComponent(m[1]).toUpperCase());
+    if (history.replaceState) history.replaceState(null, '', location.pathname);
+  }
+  CODE = store(CODE_KEY) || '';
+  if (!CODE) { showLogin(''); return; }
+  loadFeed();
+}
+
+function showLogin(msg) {
+  show('loginView', true); show('loadingView', false); show('errorView', false); show('tabs', false); show('reloadBtn', false);
+  hideTabs();
+  document.getElementById('loginErr').textContent = msg || '';
+  document.getElementById('who').innerHTML = '&nbsp;';
+}
+
+function submitCode() {
+  var v = document.getElementById('codeInput').value.replace(/\s/g, '').toUpperCase();
+  if (!v) { document.getElementById('loginErr').textContent = 'コードを入力してください。'; return; }
+  CODE = v;
+  store(CODE_KEY, v);
+  loadFeed();
+}
+
+function hideTabs() {
+  show('tab-msgs', false); show('tab-docs', false); show('tab-photos', false);
+}
+
+function loadFeed() {
+  show('loginView', false); show('errorView', false);
+  if (!FEED) show('loadingView', true);
+  api('parentFeed').then(function (j) {
+    FEED = j;
+    show('loadingView', false); show('tabs', true); show('reloadBtn', true);
+    document.getElementById('who').textContent = j.family.player + ' 保護者様';
+    renderAll();
+    showTab(CURRENT_TAB);
+  }).catch(function (err) {
+    show('loadingView', false);
+    if (err.message.indexOf('アクセスコード') >= 0) {
+      store(CODE_KEY, null); CODE = ''; FEED = null;
+      showLogin(err.message);
+      return;
+    }
+    hideTabs();
+    document.getElementById('errorText').textContent = '読み込めませんでした：' + err.message;
+    show('errorView', true);
+  });
+}
+
+function showTab(name) {
+  CURRENT_TAB = name;
+  var btns = document.querySelectorAll('nav.tabs button');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].className = btns[i].getAttribute('data-tab') === name ? 'active' : '';
+  }
+  hideTabs();
+  show('tab-' + name, true);
+  window.scrollTo(0, 0);
+}
+
+function renderAll() {
+  renderMessages();
+  renderDocFilter();
+  renderDocs();
+  renderBadges();
+}
+
+// ===== お知らせ =====
+function findMsg(id) {
+  for (var i = 0; i < FEED.messages.length; i++) if (FEED.messages[i].id === id) return FEED.messages[i];
+  return null;
+}
+
+function msgHtml(m) {
+  var unread = !m.readAt;
+  var h = '<div class="card msg' + (unread ? ' unread' : '') + '" id="msg-' + m.id + '">';
+  h += '<div class="msg-head" onclick="toggleMsg(\'' + m.id + '\')">';
+  h += '<div class="msg-title">' + (unread ? '<span class="dot"></span>' : '') + '<span>' + esc(m.title) + '</span></div>';
+  h += '<div class="msg-meta">' + esc(m.at) + '　' + esc(m.sender) + (m.eventName ? '　' + esc(m.eventName) : '') + '</div>';
+  if (m.needAck && !m.ackAt) h += '<span class="tag tag-warn">要確認</span>';
+  if (m.needAck && m.ackAt) h += '<span class="tag tag-ok">確認済み</span>';
+  h += '</div>';
+  h += '<div class="msg-body"' + (OPEN[m.id] ? '' : ' hidden') + '>' + linkify(m.body);
+  if (m.needAck) {
+    if (m.ackAt) {
+      h += '<div class="ack-box done">確認済み（' + esc(m.ackAt) + '）</div>';
+    } else {
+      h += '<div class="ack-box">内容を確認したら、ボタンを押してください。' +
+           '<button class="btn btn-primary btn-block" id="ackBtn-' + m.id + '" onclick="ackMsg(\'' + m.id + '\')">確認しました</button></div>';
+    }
+  }
+  h += '</div></div>';
+  return h;
+}
+
+function renderMessages() {
+  var box = document.getElementById('tab-msgs');
+  if (!FEED.messages.length) { box.innerHTML = '<div class="card center">お知らせはまだありません。</div>'; return; }
+  var h = '';
+  for (var i = 0; i < FEED.messages.length; i++) h += msgHtml(FEED.messages[i]);
+  box.innerHTML = h;
+}
+
+function rerenderMsg(m) {
+  var el = document.getElementById('msg-' + m.id);
+  if (el) el.outerHTML = msgHtml(m);
+  renderBadges();
+}
+
+function toggleMsg(id) {
+  var m = findMsg(id);
+  if (!m) return;
+  OPEN[id] = !OPEN[id];
+  if (OPEN[id] && !m.readAt) {
+    m.readAt = 'local';
+    api('markRead', { msgId: id }).then(function (j) { m.readAt = j.readAt; }).catch(function () { m.readAt = ''; });
+  }
+  rerenderMsg(m);
+}
+
+function ackMsg(id) {
+  var m = findMsg(id);
+  var btn = document.getElementById('ackBtn-' + id);
+  if (btn) { btn.disabled = true; btn.textContent = '送信中…'; }
+  api('ack', { msgId: id }).then(function (j) {
+    m.readAt = j.readAt; m.ackAt = j.ackAt;
+    OPEN[id] = true;
+    rerenderMsg(m);
+    toast('確認を送りました');
+  }).catch(function (err) {
+    if (btn) { btn.disabled = false; btn.textContent = '確認しました'; }
+    toast('送れませんでした：' + err.message, true);
+  });
+}
+
+// ===== 資料 =====
+function renderDocFilter() {
+  var sel = document.getElementById('docFilter');
+  var cur = sel.value;
+  var used = {};
+  var hasCommon = false;
+  for (var i = 0; i < FEED.documents.length; i++) {
+    if (FEED.documents[i].eventId) used[FEED.documents[i].eventId] = true; else hasCommon = true;
+  }
+  var h = '<option value="">すべての資料</option>';
+  for (var j = 0; j < FEED.events.length; j++) {
+    var ev = FEED.events[j];
+    if (used[ev.id]) h += '<option value="' + esc(ev.id) + '">' + esc(ev.date + '　' + ev.name) + '</option>';
+  }
+  if (hasCommon) h += '<option value="_common">共通の資料</option>';
+  sel.innerHTML = h;
+  sel.value = cur;
+  if (sel.value !== cur) sel.value = '';
+}
+
+function renderDocs() {
+  var f = document.getElementById('docFilter').value;
+  var box = document.getElementById('docList');
+  var h = '';
+  for (var i = 0; i < FEED.documents.length; i++) {
+    var d = FEED.documents[i];
+    if (f === '_common' && d.eventId) continue;
+    if (f && f !== '_common' && d.eventId !== f) continue;
+    var stamp = d.updatedAt ? d.updatedAt + ' 更新' : d.createdAt;
+    h += '<div class="card doc"><div>';
+    h += '<div class="doc-title">' + esc(d.title) + '</div>';
+    h += '<div class="msg-meta">' + esc(d.eventName || '共通') + '　' + esc(stamp) + '</div>';
+    if (isNew(d.updatedAt || d.createdAt)) h += '<span class="tag tag-new">新着</span>';
+    h += '</div><div class="doc-actions">';
+    if (d.viewUrl) h += '<a class="btn btn-outline" href="' + esc(d.viewUrl) + '" target="_blank" rel="noopener">開く</a>';
+    if (d.downloadUrl) h += '<a class="btn btn-outline" href="' + esc(d.downloadUrl) + '" target="_blank" rel="noopener">ダウンロード</a>';
+    h += '</div></div>';
+  }
+  box.innerHTML = h || '<div class="card center">資料はまだありません。</div>';
+}
+
+function renderBadges() {
+  var n = 0, i;
+  for (i = 0; i < FEED.messages.length; i++) {
+    var m = FEED.messages[i];
+    if (!m.readAt || (m.needAck && !m.ackAt)) n++;
+  }
+  var dn = 0;
+  for (i = 0; i < FEED.documents.length; i++) {
+    if (isNew(FEED.documents[i].updatedAt || FEED.documents[i].createdAt)) dn++;
+  }
+  var b = document.getElementById('msgBadge');
+  b.textContent = n; b.hidden = n === 0;
+  var c = document.getElementById('docBadge');
+  c.textContent = dn; c.hidden = dn === 0;
+}
+
+document.getElementById('codeInput').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') submitCode();
+});
+
+init();
+</script>
+</body>
+</html>
