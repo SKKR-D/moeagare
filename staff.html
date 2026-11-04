@@ -21,8 +21,9 @@
   .head-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: 960px; margin: 0 auto; }
   .app-title { font-size: 17px; font-weight: 700; margin: 0; }
   .who { font-size: 13px; opacity: .9; margin: 2px auto 10px; max-width: 960px; }
-  .head-btns { display: flex; gap: 6px; }
-  .icon-btn { background: rgba(255,255,255,.16); color: #fff; border: 0; border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+  .head-btns { display: flex; gap: 6px; flex: none; }
+  .icon-btn { background: rgba(255,255,255,.16); color: #fff; border: 0; border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  @media (max-width: 480px) { .app-title { font-size: 15px; } .icon-btn { padding: 6px 8px; font-size: 12px; } }
   nav.tabs { display: flex; gap: 4px; max-width: 960px; margin: 0 auto; }
   nav.tabs button { flex: 1; background: transparent; border: 0; color: rgba(255,255,255,.75); font: inherit; font-size: 15px; font-weight: 500; padding: 10px 4px 12px; border-bottom: 3px solid transparent; cursor: pointer; }
   nav.tabs button.active { color: #fff; border-bottom-color: #fff; }
