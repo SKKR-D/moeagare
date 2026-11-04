@@ -3,20 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#5c3d8f">
+<meta name="theme-color" content="#2b6b57">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="強化 指導者">
 <title>強化指定事業 指導者ポータル</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   :root {
-    --theme: #5c3d8f; --theme-dark: #462d6e; --theme-soft: #efe9f7;
-    --bg: #f4f2f7; --card: #ffffff; --text: #222222; --muted: #6b6b76; --line: #e2dfe8;
-    --warn: #c2410c; --warn-soft: #fff1e8; --ok: #15803d; --ok-soft: #e8f6ed;
+    /* 参考テンプレートの淡い緑系。文字を載せる色は、屋外の日差しでも読めるよう濃くしてある（白文字とのコントラスト6:1以上） */
+    --theme: #2b6b57; --theme-dark: #1f5143; --theme-soft: #e9f2d6; --sage: #a8d4a0; --lime: #e4efb4;
+    --bg: #f4f7ee; --card: #ffffff; --text: #1b2622; --muted: #4d5c55; --line: #cdd9c6;
+    --warn: #b23c12; --warn-soft: #fdebe2; --ok: #1d6b3a; --ok-soft: #dff0e2; --alert: #c8411a;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 15px; line-height: 1.6; -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 16px; line-height: 1.6; -webkit-text-size-adjust: 100%; }
   header { background: var(--theme); color: #fff; padding: 14px 16px 0; position: sticky; top: 0; z-index: 10; }
   .head-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: 960px; margin: 0 auto; }
   .app-title { font-size: 17px; font-weight: 700; margin: 0; }
@@ -25,8 +27,8 @@
   .icon-btn { background: rgba(255,255,255,.16); color: #fff; border: 0; border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
   @media (max-width: 480px) { .app-title { font-size: 15px; } .icon-btn { padding: 6px 8px; font-size: 12px; } }
   nav.tabs { display: flex; gap: 4px; max-width: 960px; margin: 0 auto; }
-  nav.tabs button { flex: 1; background: transparent; border: 0; color: rgba(255,255,255,.75); font: inherit; font-size: 15px; font-weight: 500; padding: 10px 4px 12px; border-bottom: 3px solid transparent; cursor: pointer; }
-  nav.tabs button.active { color: #fff; border-bottom-color: #fff; }
+  nav.tabs button { flex: 1; background: transparent; border: 0; color: #cfe6c9; font: inherit; font-size: 15px; font-weight: 500; padding: 10px 4px 12px; border-bottom: 3px solid transparent; cursor: pointer; }
+  nav.tabs button.active { color: #fff; border-bottom-color: var(--lime); font-weight: 700; }
   main { max-width: 960px; margin: 0 auto; padding: 16px 16px 64px; }
   .grid { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
   @media (min-width: 900px) { .grid { grid-template-columns: 420px 1fr; } }
@@ -35,7 +37,7 @@
   .center { text-align: center; color: var(--muted); }
   .field { margin-bottom: 12px; }
   .field > label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
-  input[type=text], input[type=url], input[type=date], input[type=email], select, textarea { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  input[type=text], input[type=url], input[type=date], input[type=email], select, textarea { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid #b9c9b1; border-radius: 10px; background: #fff; }
   textarea { min-height: 140px; resize: vertical; }
   .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -47,7 +49,7 @@
   .count.zero { color: var(--warn); }
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: inherit; font-weight: 700; border-radius: 10px; padding: 11px 18px; border: 0; cursor: pointer; text-decoration: none; }
   .btn-primary { background: var(--theme); color: #fff; }
-  .btn-primary:disabled { background: #a99bc2; cursor: default; }
+  .btn-primary:disabled { background: #8fb3a5; cursor: default; }
   .btn-outline { background: #fff; color: var(--theme); border: 1px solid var(--theme); padding: 6px 12px; font-size: 13px; }
   .btn-danger { background: #fff; color: var(--warn); border: 1px solid var(--warn); padding: 6px 12px; font-size: 13px; }
   .btn-block { width: 100%; }
@@ -60,7 +62,7 @@
   .stat { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 6px; padding: 1px 8px; margin: 6px 6px 0 0; background: var(--theme-soft); color: var(--theme); }
   .stat.warn { background: var(--warn-soft); color: var(--warn); }
   .stat.ok { background: var(--ok-soft); color: var(--ok); }
-  .stat.gray { background: #eee; color: #777; }
+  .stat.gray { background: #e8ece4; color: #4d5c55; }
   .cancelled { opacity: .55; }
   .code { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: 1px; }
   .sub-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
@@ -83,6 +85,26 @@
   .toast.show { display: block; }
   .toast.error { background: var(--warn); }
   [hidden] { display: none !important; }
+
+  /* 配布カード（A4に2列×4段＝8枚） */
+  #printArea { display: none; }
+  @media print {
+    @page { size: A4; margin: 10mm; }
+    body { background: #fff; }
+    body > *:not(#printArea) { display: none !important; }
+    #printArea { display: block; }
+  }
+  .card-sheet { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 68.5mm; width: 190mm; page-break-after: always; break-after: page; }
+  .card-sheet:last-child { page-break-after: auto; break-after: auto; }
+  .dcard { border: 1px dashed #999; padding: 4mm 5mm; display: grid; grid-template-columns: 1fr 30mm; gap: 2mm 4mm; color: #000; font-size: 9pt; line-height: 1.45; overflow: hidden; }
+  .dcard .d-sys { grid-column: 1 / -1; font-size: 8pt; color: #2b6b57; font-weight: 700; border-bottom: 1px solid #2b6b57; padding-bottom: 1mm; }
+  .dcard .d-name { font-size: 13pt; font-weight: 700; margin: 0 0 1.5mm; }
+  .dcard ol { margin: 0; padding-left: 4.5mm; }
+  .dcard .d-qr { width: 30mm; height: 30mm; }
+  .dcard .d-qr img, .dcard .d-qr canvas { width: 30mm !important; height: 30mm !important; }
+  .dcard .d-code { grid-column: 1 / -1; font-size: 8pt; display: flex; justify-content: space-between; gap: 4mm; align-items: flex-end; }
+  .dcard .d-code b { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 10pt; letter-spacing: 1px; }
+  .dcard .d-warn { color: #b4441a; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -178,6 +200,7 @@
 </main>
 
 <div id="modalRoot"></div>
+<div id="printArea"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -529,10 +552,10 @@ function openDetail(id) {
       return ka - kb;
     });
     var h = '<div class="preview" style="margin-bottom:12px">' + esc(m.body) + '</div>';
-    h += '<table class="list"><tr><th>選手（保護者）</th><th>区分</th><th>既読</th>' + (j.needAck ? '<th>確認</th>' : '') + '</tr>';
+    h += '<table class="list"><tr><th>家庭</th><th>区分</th><th>既読</th>' + (j.needAck ? '<th>確認</th>' : '') + '</tr>';
     for (var i = 0; i < rows.length; i++) {
       var r = rows[i];
-      h += '<tr><td>' + esc(r.player) + (r.parent ? '<div class="meta">' + esc(r.parent) + '</div>' : '') + '</td>' +
+      h += '<tr><td>' + esc(r.player) + ' 保護者' + (r.registered ? '' : '<div><span class="stat gray">未登録</span></div>') + '</td>' +
         '<td class="meta">' + esc(r.gender) + (r.team ? '・' + esc(r.team) : '') + '</td>' +
         '<td>' + (r.readAt ? '<span class="meta">' + esc(r.readAt.slice(5)) + '</span>' : '<span class="stat warn">未読</span>') + '</td>' +
         (j.needAck ? '<td>' + (r.ackAt ? '<span class="stat ok">済</span>' : '<span class="stat warn">未</span>') + '</td>' : '') + '</tr>';
@@ -708,21 +731,30 @@ function findIn(list, id) {
 // --- 名簿 ---
 function renderMembers() {
   var ms = ADMIN.members;
-  var missing = 0;
+  var missing = 0, unreg = 0, k;
+  for (k = 0; k < ms.length; k++) {
+    if (!ms[k].code || !ms[k].id) missing++;
+    else if (!ms[k].registered) unreg++;
+  }
   var h = '<div class="actions" style="margin:0 0 12px">' +
     '<button class="btn btn-primary" onclick="editMember(\'\')">家庭を追加</button>';
-  for (var k = 0; k < ms.length; k++) if (!ms[k].code || !ms[k].id) missing++;
   if (missing) h += '<button class="btn btn-outline" onclick="issueCodes(' + missing + ')">未発行の' + missing + '家庭にコードを発行</button>';
+  if (ms.length - missing > 0) h += '<button class="btn btn-outline" onclick="printCards(false)">配布カードを印刷（全家庭）</button>';
+  if (unreg) h += '<button class="btn btn-outline" onclick="printCards(true)">未登録の' + unreg + '家庭だけ印刷</button>';
   h += '</div>';
-  h += '<p class="meta" style="margin-top:0">' + ms.length + '家庭。スプレッドシートの members シートに直接貼り付けた名簿にも、上のボタンで家庭IDとコードを付けられます。</p>';
-  h += '<table class="list"><tr><th>選手</th><th>区分・タグ</th><th>コード</th><th></th></tr>';
+  h += '<p class="meta" style="margin-top:0">' + ms.length + '家庭（登録済み ' + (ms.length - missing - unreg) + '・未登録 ' + unreg + '）。' +
+    '保護者は配布カードのQRを読み取り、メールアドレスと同意を登録します。メールアドレスは管理者にも表示されません。</p>';
+  h += '<table class="list"><tr><th>選手</th><th>区分・タグ</th><th>コード</th><th>登録</th><th></th></tr>';
   for (var i = 0; i < ms.length; i++) {
     var m = ms[i];
-    h += '<tr><td><b>' + esc(m.player) + '</b><div class="meta">' + esc(m.parent || '') + '</div></td>' +
+    h += '<tr><td><b>' + esc(m.player) + '</b></td>' +
       '<td>' + esc(m.gender) + (m.team ? '・' + esc(m.team) : '') + (m.tags ? '<div class="meta">' + esc(m.tags.split('|').join('、')) + '</div>' : '') + '</td>' +
-      '<td class="code">' + esc(m.code || '未発行') + '</td><td><div class="actions" style="margin:0">';
+      '<td class="code">' + esc(m.code || '未発行') + '</td>' +
+      '<td>' + (m.registered ? '<span class="stat ok">登録済み</span><div class="meta">通知先 ' + m.mailCount + '件</div>' : '<span class="stat warn">未登録</span>') + '</td>' +
+      '<td><div class="actions" style="margin:0">';
     if (m.id) h += '<button class="btn btn-outline" onclick="editMember(\'' + m.id + '\')">編集</button>';
     if (m.code) h += '<button class="btn btn-outline" onclick="copyText(parentUrl(\'' + m.code + '\'), \'保護者用URLを\')">URLコピー</button>';
+    if (m.registered) h += '<button class="btn btn-outline" onclick="resetReg(\'' + m.id + '\')">登録やり直し</button>';
     if (m.id && m.code) h += '<button class="btn btn-danger" onclick="regen(\'member\', \'' + m.id + '\')">再発行</button>';
     h += '</div></td></tr>';
   }
@@ -730,21 +762,64 @@ function renderMembers() {
   $('adminBody').innerHTML = h;
 }
 
+function resetReg(id) {
+  var m = findIn(ADMIN.members, id);
+  openModal('登録をやり直しますか？', '<p>' + esc(m.player) + ' 保護者の通知メールと同意の記録を消します。次にポータルを開いたとき、もう一度登録画面が出ます。メールアドレスを間違えたときなどに使ってください。</p><p class="meta">アクセスコードとURLは変わりません。</p>', [
+    { label: 'やめる' },
+    { label: 'やり直す', cls: 'btn-primary', fn: function (btn) {
+      runBusy(btn, '処理中…', api('resetRegistration', { id: id }), function () { afterAdminChange('登録をリセットしました'); });
+    } }
+  ]);
+}
+
+// ===== 配布カード =====
+function printCards(onlyUnreg) {
+  if (typeof QRCode === 'undefined') { toast('QRコードの部品を読み込めませんでした。通信状態を確認してください', true); return; }
+  var list = [];
+  for (var i = 0; i < ADMIN.members.length; i++) {
+    var m = ADMIN.members[i];
+    if (!m.id || !m.code) continue;
+    if (onlyUnreg && m.registered) continue;
+    list.push(m);
+  }
+  if (!list.length) { toast('印刷する家庭がありません', true); return; }
+  var area = $('printArea');
+  var h = '';
+  for (var p = 0; p < list.length; p += 8) {
+    h += '<div class="card-sheet">';
+    for (var j = p; j < Math.min(p + 8, list.length); j++) {
+      var c = list[j];
+      h += '<div class="dcard">' +
+        '<div class="d-sys">強化指定事業 保護者ポータル　登録カード</div>' +
+        '<div><p class="d-name">' + esc(c.player) + ' 保護者様</p>' +
+        '<ol><li>右のQRコードをスマホのカメラで読み取る</li>' +
+        '<li>メールアドレスを入力し、同意して「登録する」</li>' +
+        '<li>ホーム画面に追加すると、次から1タップで開けます</li></ol></div>' +
+        '<div class="d-qr" id="qr-' + esc(c.id) + '"></div>' +
+        '<div class="d-code"><span class="d-warn">このカードはご家庭の外に出さないでください</span>' +
+        '<span>コード <b>' + esc(c.code) + '</b></span></div></div>';
+    }
+    h += '</div>';
+  }
+  area.innerHTML = h;
+  for (var k = 0; k < list.length; k++) {
+    new QRCode($('qr-' + list[k].id), { text: parentUrl(list[k].code), width: 240, height: 240, correctLevel: QRCode.CorrectLevel.M });
+  }
+  setTimeout(function () { window.print(); }, 400);
+}
+
 function editMember(id) {
-  var m = id ? findIn(ADMIN.members, id) : { player: '', gender: '男子', team: '', tags: '', parent: '', email: '', lineId: '' };
+  var m = id ? findIn(ADMIN.members, id) : { player: '', gender: '男子', team: '', tags: '' };
   var html =
     '<div class="field"><label>選手名</label><input type="text" id="fPlayer" value="' + esc(m.player) + '"></div>' +
     '<div class="row2"><div class="field"><label>性別</label><select id="fGender"><option value="男子">男子</option><option value="女子">女子</option></select></div>' +
     '<div class="field"><label>チーム</label><select id="fTeam"><option value="">未定</option><option value="A">A</option><option value="B">B</option></select></div></div>' +
     '<div class="field"><label>追加タグ（複数は「、」で区切る）</label><input type="text" id="fTags" value="' + esc((m.tags || '').split('|').join('、')) + '" placeholder="例：遠征、宿泊あり"></div>' +
-    '<div class="field"><label>保護者名</label><input type="text" id="fParent" value="' + esc(m.parent) + '"></div>' +
-    '<div class="field"><label>メール（通知用）</label><input type="email" id="fEmail" value="' + esc(m.email) + '"></div>' +
-    '<div class="field"><label>LINE ID（将来の通知用・任意）</label><input type="text" id="fLine" value="' + esc(m.lineId) + '"></div>';
+    '<p class="meta">保護者の氏名は登録しません。通知メールは保護者が配布カードから登録します。</p>';
   openModal(id ? '家庭を編集' : '家庭を追加', html, [
     { label: 'やめる' },
     { label: '保存する', cls: 'btn-primary', fn: function (btn) {
-      var data = { id: id, player: $('fPlayer').value, gender: $('fGender').value, team: $('fTeam').value,
-        tags: $('fTags').value, parent: $('fParent').value, email: $('fEmail').value, lineId: $('fLine').value };
+      var data = { id: id, player: $('fPlayer').value, gender: $('fGender').value, team: $('fTeam').value, tags: $('fTags').value };
       runBusy(btn, '保存中…', api('saveMember', { member: data }), function (j) {
         afterAdminChange(j.code ? '追加しました（コード ' + j.code + '）' : '保存しました');
       });
